@@ -1,0 +1,15 @@
+Host ailab-ollama
+    HostName localhost
+    User root
+    Port 22001
+    IdentityFile ~/.ssh/id_rsa
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+
+Host ailab-vllm
+    HostName localhost
+    User root
+    Port 22002
+    IdentityFile ~/.ssh/id_rsa
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null

@@ -1,0 +1,20 @@
+# Models to automatically pull on container start
+# One model per line. Lines starting with # are ignored.
+
+# > 16GB
+# qwen3-coder-next:q4_K_M
+# qpt-oss:20b
+
+# 16 GB
+# qwen2.5-coder:7b
+qwen3.5:9b
+
+
+# <= 8GB
+tinyllama:latest
+# llama3.2:3b
+# lfm2.5:8b
+# yi-coder:1.5b
+
+# Default (Low-Quality but fast and small)
+gemma4:e2b

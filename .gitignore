@@ -1,0 +1,5 @@
+# Secrets and local config
+**/.env
+common/ssh/authorized_keys
+ollama/mnt
+vllm/mnt

@@ -1,0 +1,73 @@
+services:
+  ollama:
+    container_name: ollama
+    hostname: ollama
+    build:
+      context: .
+      dockerfile: ${OLLAMA_DIR}/Dockerfile
+    ports:
+      - "${OLLAMA_IP_WEB}:${OLLAMA_PORT_WEB}:11434"
+      - "${OLLAMA_IP_SSH}:${OLLAMA_PORT_SSH}:22"
+    volumes:
+      - ${OLLAMA_DIR}/mnt/.ollama:/root/.ollama
+      - ${OLLAMA_DIR}/scripts/entrypoint.bash:/entrypoint.bash:ro
+      - ${OLLAMA_DIR}/models.txt:/models.txt:ro
+      - ${COMMON_DIR}/ssh/sshd_config:/etc/ssh/sshd_config:ro
+      - ${COMMON_DIR}/ssh/authorized_keys:/tmp/authorized_keys:ro
+    devices:
+      - /dev/kfd
+      - /dev/dri
+    env_file: 
+      - .env
+      - ${OLLAMA_DIR}/.env
+    entrypoint: ["/entrypoint.bash"]
+    group_add:
+      - "44"
+      - "992"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      start_period: 120s
+      interval: 60s
+      timeout: 3s
+      retries: 3
+    networks:
+      - ailab-local
+
+  vllm:
+    container_name: vllm
+    hostname: vllm
+    build:
+      context: .
+      dockerfile: ${VLLM_DIR}/Dockerfile
+    ports:
+      - "${VLLM_IP_WEB}:${VLLM_PORT_WEB}:${VLLM_PORT_WEB}"
+      - "${VLLM_IP_SSH}:${VLLM_PORT_SSH}:22"
+    volumes:
+      - ${VLLM_DIR}/mnt:/root/.cache/huggingface
+      - ${VLLM_DIR}/scripts/entrypoint.bash:/entrypoint.bash:ro
+      - ${COMMON_DIR}/ssh/sshd_config:/etc/ssh/sshd_config:ro
+      - ${COMMON_DIR}/ssh/authorized_keys:/tmp/authorized_keys:ro
+    devices:
+      - /dev/kfd
+      - /dev/dri
+    env_file:
+      - .env
+      - ${VLLM_DIR}/.env
+    entrypoint: ["/entrypoint.bash"]
+    group_add:
+      - "44"
+      - "992"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:${VLLM_PORT:-8000}/v1/models"]
+      start_period: 180s
+      interval: 60s
+      timeout: 5s
+      retries: 3
+    networks:
+      - ailab-local
+
+networks:
+  ailab-local:
+    driver: bridge

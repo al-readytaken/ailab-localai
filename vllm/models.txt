@@ -1,0 +1,7 @@
+# Models to serve with vLLM
+# The VLLM_MODEL env var sets the primary model.
+# vLLM serves one model at a time by default.
+# This file is for reference / documentation purposes.
+# To serve a different model, change VLLM_MODEL in .env
+
+Qwen/Qwen2.5-0.5B-Instruct
