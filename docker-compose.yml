@@ -68,6 +68,41 @@ services:
     networks:
       - ailab-local
 
+  llamacpp:
+    container_name: llamacpp
+    hostname: llamacpp
+    build:
+      context: .
+      dockerfile: ${LLAMACPP_DIR}/Dockerfile
+    ports:
+      - "${LLAMACPP_IP_WEB}:${LLAMACPP_PORT_WEB}:8080"
+      - "${LLAMACPP_IP_SSH}:${LLAMACPP_PORT_SSH}:22"
+    volumes:
+      - ${LLAMACPP_DIR}/mnt:/models
+      - ${LLAMACPP_DIR}/scripts/entrypoint.bash:/entrypoint.bash:ro
+      - ${LLAMACPP_DIR}/models.txt:/models.txt:ro
+      - ${COMMON_DIR}/ssh/sshd_config:/etc/ssh/sshd_config:ro
+      - ${COMMON_DIR}/ssh/authorized_keys:/tmp/authorized_keys:ro
+    devices:
+      - /dev/kfd
+      - /dev/dri
+    env_file:
+      - .env
+      - ${LLAMACPP_DIR}/.env
+    entrypoint: ["/entrypoint.bash"]
+    group_add:
+      - "44"
+      - "992"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8080/health"]
+      start_period: 120s
+      interval: 60s
+      timeout: 5s
+      retries: 3
+    networks:
+      - ailab-local
+
 networks:
   ailab-local:
     driver: bridge

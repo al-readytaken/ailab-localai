@@ -3,3 +3,4 @@
 common/ssh/authorized_keys
 ollama/mnt
 vllm/mnt
+llamacpp/mnt

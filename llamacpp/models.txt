@@ -1,0 +1,4 @@
+# Models to download on container start
+# Format: hf_org/hf_repo/filename.gguf
+#Qwen/Qwen2.5-0.5B-Instruct-GGUF/qwen2.5-0.5b-instruct-q4_k_m.gguf
+AaryanK/Qwen3.5-9B-GGUF/Qwen3.5-9B.q4_k_m.gguf
