@@ -19,7 +19,7 @@ RUN export VLLM_ROCM_VARIANT=$(curl -s https://wheels.vllm.ai/rocm/vllm | grep -
 RUN echo "export PATH=\$PATH:/root/.local/bin" > /root/.bashrc
 RUN export PATH=$PATH:/root/.local/bin && \
     uv venv /root/.venv && \
-    bash -c "source /root/.venv/bin/activate && uv pip install vllm --extra-index-url https://wheels.vllm.ai/rocm/ --upgrade"
+    bash -c "source /root/.venv/bin/activate && uv pip install fastokens && uv pip install 'fastapi>=0.100.0,<0.137.0' vllm --extra-index-url https://wheels.vllm.ai/rocm/ --upgrade"
 
 # SSH
 RUN mkdir -p /var/run/sshd /root/.ssh && \

@@ -26,14 +26,15 @@ MODEL="${VLLM_MODEL:-Qwen/Qwen2.5-0.5B-Instruct}"
 VLLM_ARGS=("serve" "$MODEL")
 
 # qwen
+VLLM_ARGS+=("-O3")
+VLLM_ARGS+=("--enable-prefix-caching")
 VLLM_ARGS+=("--enable-auto-tool-choice")
 VLLM_ARGS+=("--tool-call-parser" "hermes")
 
-# VLLM_ARGS+=("--rope-scaling" '{"type":"yarn","factor":4.0}')
-VLLM_ARGS+=("--max-num-seqs" 2)
 
 # VLLM_ARGS+=("--enable-reasoning")
 # VLLM_ARGS+=("--reasoning-parser" "deepseek_v4")
+  # VLLM_ARGS+=("--rope-scaling" '{"type":"yarn","factor":4.0}')
 
 # Add host and port
 VLLM_ARGS+=("--host" "${VLLM_IP_WEB:-0.0.0.0}")
@@ -55,6 +56,22 @@ fi
 
 if [ -n "$VLLM_TENSOR_PARALLEL_SIZE" ]; then
   VLLM_ARGS+=("--tensor-parallel-size" "$VLLM_TENSOR_PARALLEL_SIZE")
+fi
+
+if [ -n "$VLLM_DATA_PARALLEL_SIZE" ]; then
+  VLLM_ARGS+=("--data_parallel_size" "$VLLM_DATA_PARALLEL_SIZE")
+fi
+
+if [ -n "$VLLM_KV_CACHE_QUANT" ]; then
+  VLLM_ARGS+=("--kv-cache-dtype" "$VLLM_KV_CACHE_QUANT")
+fi
+
+if [ -n "$VLLM_MAX_NUM_SEQ" ]; then
+  VLLM_ARGS+=("--max-num-seqs" "$VLLM_MAX_NUM_SEQ")
+fi
+
+if [ -n "$VLLM_MAX_NUM_BATCHED_TOKENS" ]; then
+  VLLM_ARGS+=("--max-num-batched-tokens" "$VLLM_MAX_NUM_BATCHED_TOKENS")
 fi
 
 # Extra args from env (space-separated)
