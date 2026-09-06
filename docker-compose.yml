@@ -33,6 +33,25 @@ services:
       retries: 3
     networks:
       - ailab-local
+  ollama-exporter:
+    container_name: ollama-exporter
+    hostname: ollama-exporter
+    depends_on: 
+      - ollama
+    image: ghcr.io/maravexa/ollama-exporter:latest
+    environment:
+      - "OLLAMA_URL=http://ollama:11434"
+    ports:
+      - "${OLLAMA_IP_METRICS}:${OLLAMA_PORT_METRICS}:9400"
+      - "${OLLAMA_IP_METRICS}:${OLLAMA_PORT_WEB}:9401"
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:9401"]
+      start_period: 120s
+      interval: 60s
+      timeout: 3s
+      retries: 3
+    networks:
+      - ailab-local
 
   vllm:
     container_name: vllm
@@ -44,6 +63,8 @@ services:
       - "${VLLM_IP_WEB}:${VLLM_PORT_WEB}:${VLLM_PORT_WEB}"
       - "${VLLM_IP_SSH}:${VLLM_PORT_SSH}:22"
     volumes:
+      - ${VLLM_DIR}/mnt/models:/models
+      - ${VLLM_DIR}/models.txt:/models.txt:ro
       - ${VLLM_DIR}/mnt:/root/.cache/huggingface
       - ${VLLM_DIR}/scripts/entrypoint.bash:/entrypoint.bash:ro
       - ${COMMON_DIR}/ssh/sshd_config:/etc/ssh/sshd_config:ro
@@ -78,7 +99,7 @@ services:
       - "${LLAMACPP_IP_WEB}:${LLAMACPP_PORT_WEB}:8080"
       - "${LLAMACPP_IP_SSH}:${LLAMACPP_PORT_SSH}:22"
     volumes:
-      - ${LLAMACPP_DIR}/mnt:/models
+      - ${LLAMACPP_DIR}/mnt/models:/models
       - ${LLAMACPP_DIR}/scripts/entrypoint.bash:/entrypoint.bash:ro
       - ${LLAMACPP_DIR}/models.txt:/models.txt:ro
       - ${COMMON_DIR}/ssh/sshd_config:/etc/ssh/sshd_config:ro

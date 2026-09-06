@@ -14,6 +14,28 @@ mkdir -p /var/run/sshd
 /usr/sbin/sshd
 echo "-> SSH daemon started"
 
+
+MODEL_DIR="${VLLM_MODEL_DIR:-/models}"
+mkdir -p "$MODEL_DIR"
+if [ -f /models.txt ]; then
+  while IFS= read -r line || [ -n "$line" ]; do
+    line="$(echo "$line" | xargs)"
+    [ -z "$line" ] && continue
+    [[ "$line" == \#* ]] && continue
+
+    repo="$(echo "$line" | cut -d'/' -f1-2)"
+    file="$(echo "$line" | cut -d'/' -f3-)"
+    output="$MODEL_DIR/$(basename "$file")"
+
+    if [ ! -f "$output" ]; then
+      echo "-> Downloading model: $line"
+      hf download "$repo" "$file" --local-dir "$MODEL_DIR" 2>&1 || true
+    else
+      echo "-> Model exists: $output"
+    fi
+  done </models.txt
+fi
+
 export HF_TOKEN="$VLLM_HF_TOKEN"
 # export VLLM_LOGGING_LEVEL=DEBUG
 export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
@@ -29,7 +51,8 @@ VLLM_ARGS=("serve" "$MODEL")
 VLLM_ARGS+=("-O3")
 VLLM_ARGS+=("--enable-prefix-caching")
 VLLM_ARGS+=("--enable-auto-tool-choice")
-VLLM_ARGS+=("--tool-call-parser" "hermes")
+VLLM_ARGS+=("--tool-call-parser" "qwen3_coder")
+VLLM_ARGS+=("--reasoning-parser" "qwen3")
 
 
 # VLLM_ARGS+=("--enable-reasoning")
@@ -72,6 +95,12 @@ fi
 
 if [ -n "$VLLM_MAX_NUM_BATCHED_TOKENS" ]; then
   VLLM_ARGS+=("--max-num-batched-tokens" "$VLLM_MAX_NUM_BATCHED_TOKENS")
+fi
+
+# GGUF: fetch config/tokenizer from original unquantized model
+if [ -n "$VLLM_HF_CONFIG_PATH" ]; then
+  VLLM_ARGS+=("--hf-config-path" "$VLLM_HF_CONFIG_PATH")
+  VLLM_ARGS+=("--tokenizer" "$VLLM_HF_CONFIG_PATH")
 fi
 
 # Extra args from env (space-separated)

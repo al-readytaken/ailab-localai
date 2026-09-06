@@ -5,3 +5,6 @@
 # To serve a different model, change VLLM_MODEL in .env
 
 Qwen/Qwen2.5-0.5B-Instruct
+AaryanK/Qwen3.5-9B-GGUF/Qwen3.5-9B.q4_k_m.gguf
+ykarout/Qwen3.5-9b-Opus-Openclaw-Distilled
+

@@ -9,7 +9,6 @@
 # qwen2.5-coder:7b
 qwen3.5:9b
 
-
 # <= 8GB
 tinyllama:latest
 # llama3.2:3b
@@ -18,3 +17,8 @@ tinyllama:latest
 
 # Default (Low-Quality but fast and small)
 gemma4:e2b
+
+
+# hf
+hf.co/deepreinforce-ai/Ornith-1.0-9B-GGUF
+hf.co/unsloth/Qwen3.5-9B-GGUF:Q4_K_M
